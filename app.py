@@ -13,6 +13,7 @@ class BaseModel(Model):
 
 class Transaction(BaseModel):
     id = AutoField()
+    visitor_ip = CharField()
     transaction_date = DateTimeField()
     filename_original = CharField()
     filename_converted = CharField()
@@ -32,13 +33,20 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def getVisitorIP():
+    #  Get X-Real-IP from request.headers. if is none, then return 127.0.0.1
+    return request.headers.get('X-Real-IP', '127.0.0.1').split(',')[0]
+
 @app.route('/')
 def index():
-    histories = Transaction.select().order_by(Transaction.transaction_date.desc())
+    histories = Transaction.select().where(Transaction.visitor_ip == getVisitorIP()).order_by(Transaction.transaction_date.desc()).limit(10)
     return render_template("index.html", transaction_data=histories)
 
 @app.route('/convert', methods=['POST'])
 def convertFile():
+    # get visitor IP
+    visitorIP = getVisitorIP()
+
     # check if the post request has the file part
     if 'file' not in request.files:
         return redirect(request.url)
@@ -59,6 +67,7 @@ def convertFile():
 
         # insert to Transaction Table
         Transaction.create(
+            visitor_ip = visitorIP,
             transaction_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             filename_original = filename,
             filename_converted = hashName

@@ -47,14 +47,14 @@ def convertFile():
     if file.filename == '':
         return redirect(request.url)
     if file and allowed_file(file.filename):
-        hashName = f"{uuid.uuid4().hex}.csv"
+        hashName = uuid.uuid4().hex
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['XLSXPATH'], hashName))
+        file.save(os.path.join(app.config['XLSXPATH'], f"{hashName}.xlsx"))
 
         # Read XLSX file
         read_file = pd.read_excel(file)
         # convert XLSX file to csv and save it.
-        read_file.to_csv (os.path.join(app.config['CSVPATH'], hashName),index = None,header=True)
+        read_file.to_csv (os.path.join(app.config['CSVPATH'], f"{hashName}.csv"),index = None,header=True)
 
         # insert to Transaction Table
         Transaction.create(

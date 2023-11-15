@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from peewee import *
 from werkzeug.utils import secure_filename
 import os, uuid, datetime
-import pandas as pd 
+import pandas as pd
 
 db = 'exceltocsv.db'
 database = SqliteDatabase(db)
@@ -24,6 +24,7 @@ def create_tables():
 
 ALLOWED_EXTENSIONS = {'xlsx'}
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 app.config['XLSXPATH'] = 'static/xlsx_file'
 app.config['CSVPATH'] = 'static/csv_file'
 
@@ -64,6 +65,17 @@ def convertFile():
         )
 
         return redirect(url_for('index'))
+    
+@app.route('/download-excel/<filename>')
+def downloadExcel(filename):
+    filename = f"{filename}.xlsx"
+    return send_from_directory(app.config['XLSXPATH'], filename)
+
+@app.route('/download-csv/<filename>')
+def downloadCsv(filename):
+    filename = f"{filename}.csv"
+    return send_from_directory(app.config['CSVPATH'], filename)
+
 
 if __name__ == '__main__':
     create_tables()

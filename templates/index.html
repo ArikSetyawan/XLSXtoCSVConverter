@@ -49,8 +49,8 @@
 								<td>{{loop.index}}</td>
 								<td>{{item.transaction_date}}</td>
 								<td>{{item.filename_original}}</td>
-								<td><a href="/" target="_blank" >download</a></td>
-								<td><a href="/" target="_blank" >download</a></td>
+								<td><a href="{{url_for('downloadExcel',filename=item.filename_converted)}}" target="_blank" >download</a></td>
+								<td><a href="{{url_for('downloadCsv',filename=item.filename_converted)}}" target="_blank" >download</a></td>
 							</tr>
 							{% endfor %}
 						</tbody>

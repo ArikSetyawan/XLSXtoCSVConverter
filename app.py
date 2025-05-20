@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os, uuid, datetime
 import pandas as pd
 
-db = 'exceltocsv.db'
+db = 'app/database/exceltocsv.db'
 database = SqliteDatabase(db)
 
 class BaseModel(Model):
@@ -26,8 +26,8 @@ def create_tables():
 ALLOWED_EXTENSIONS = {'xlsx'}
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
-app.config['XLSXPATH'] = 'static/xlsx_file'
-app.config['CSVPATH'] = 'static/csv_file'
+app.config['XLSXPATH'] = '/app/uploads/xlsx_file'
+app.config['CSVPATH'] = '/app/uploads/csv_file'
 
 def allowed_file(filename):
     return '.' in filename and \

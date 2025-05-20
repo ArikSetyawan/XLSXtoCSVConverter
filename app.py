@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os, uuid, datetime
 import pandas as pd
 
-db = 'app/database/exceltocsv.db'
+db = '/app/database/exceltocsv.db'
 database = SqliteDatabase(db)
 
 class BaseModel(Model):

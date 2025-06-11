@@ -1,12 +1,57 @@
 version: '3.8'
 
 services:
-  flask-app:
-    build: .
-    ports:
-      - "5001:5000"
+  xlsxtocsv:
+    image: ariksetyawan/xlsxtocsv:1.0.0
+    restart: unless-stopped
     volumes:
-      - uploaded_files_xlsx_to_csv:/app/uploads
+      - xlsxtocsvapp_xlsx:/app/uploads/xlsx_file
+      - xlsxtocsvapp_csv:/app/uploads/csv_file
+    networks:
+      - cloudflare-network-xlsx-to-csv
+    deploy:
+      resources:
+        limits:
+          memory: 150M
+          cpus: '0.2'
+
+  cloudflared-tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    networks:
+      - cloudflare-network-xlsx-to-csv
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.1'
+
+  nginx-proxy:
+    image: nginx:latest
+    restart: always
+    networks:
+      - cloudflare-network-xlsx-to-csv
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - C:\\Users\\Arik Setyawan\\Documents\\FlaskProject\\XLSXtoCSVConverter\\nginx\\nginx-config.conf:/etc/nginx/conf.d/default.conf:ro
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.1'
 
 volumes:
-  uploaded_files_xlsx_to_csv:
+  xlsxtocsvapp_xlsx:
+  xlsxtocsvapp_csv:
+
+networks:
+  cloudflare-network-xlsx-to-csv:
+    external: true

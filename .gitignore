@@ -1,3 +1,4 @@
 exceltocsv.db
 /static/csv_file/*.csv
 /static/xlsx_file/*.xlsx
+.env

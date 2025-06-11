@@ -3,9 +3,27 @@ from peewee import *
 from werkzeug.utils import secure_filename
 import os, uuid, datetime
 import pandas as pd
+from dotenv import load_dotenv
 
-db = '/app/database/exceltocsv.db'
-database = SqliteDatabase(db)
+load_dotenv()
+
+DATABASE_CONFIG = {
+    'host': os.getenv('DB_HOST'),
+    'port': int(os.getenv('DB_PORT', 5432)),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD'),
+    'database': os.getenv('DB_NAME', 'postgres')
+}
+print(DATABASE_CONFIG)
+
+database = PostgresqlDatabase(
+    database=DATABASE_CONFIG['database'],
+    user=DATABASE_CONFIG['user'],
+    password=DATABASE_CONFIG['password'],
+    host=DATABASE_CONFIG['host'],
+    port=DATABASE_CONFIG['port'],
+    autorollback=True
+)
 
 class BaseModel(Model):
 	class Meta:
